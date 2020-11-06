@@ -1,0 +1,12 @@
+{
+  "name": "engelivemob",
+  "displayName": "engelivemob",
+  "expo": {
+    "name": "engelivemob",
+    "slug": "engelivemob",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
