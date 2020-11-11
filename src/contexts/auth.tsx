@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 
+import { View, ActivityIndicator } from "react-native";
 import AsyncStorage from '@react-native-community/async-storage';
 import AuthService from '../services/auth.service.js';
 
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC = ({ children }) => {
     const [user, setUser] = useState<object | null>(null);
     const [token, setToken] = useState<string>('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadStorageData() {
@@ -26,6 +28,7 @@ export const AuthProvider: React.FC = ({ children }) => {
                 setUser(JSON.parse(storagedUser));
                 setToken(storagedToken);
             }
+            setLoading(false);
         }
 
         loadStorageData();
@@ -44,6 +47,14 @@ export const AuthProvider: React.FC = ({ children }) => {
         await AsyncStorage.clear();
         setUser(null);
         setToken('');
+    }
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#666" />
+            </View>
+        );
     }
 
     return (< AuthContext.Provider value={{ signed: !!user, token, user, login, logout }}>
