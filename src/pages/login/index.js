@@ -1,68 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 
-import AuthService from '../../services/auth.service';
+import AuthContext from "../../contexts/auth";
 
-import {
-    TextField,
-    Button,
-    Paper,
-    Typography,
-    Grid
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
 
-const useStyles = makeStyles((theme) => ({
-    layout: {
-        width: 'auto',
-        marginLeft: theme.spacing(2),
-        marginRight: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-            width: 600,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-        },
-    },
-    paper: {
-        marginTop: theme.spacing(3),
-        marginBottom: theme.spacing(3),
-        padding: theme.spacing(2),
-        [theme.breakpoints.up(600 + theme.spacing(3) * 2)]: {
-            marginTop: theme.spacing(6),
-            marginBottom: theme.spacing(6),
-            padding: theme.spacing(3),
-        },
-    },
-    buttons: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-    },
-    button: {
-        marginTop: theme.spacing(3),
-        marginLeft: theme.spacing(1),
-    },
-    erro: {
-        color: 'red'
-    },
-}));
+export default () => {
 
-export default ({ navigation }) => {
-
-    const classes = useStyles();
+    const { login } = useContext(AuthContext);
 
     const [mensagemErro, setMensagemErro] = useState("");
 
-    const { register, errors, handleSubmit, reset } = useForm({});
+    const { control, handleSubmit, errors } = useForm();
 
-    const cbSubmit = (inputs) => {
-        AuthService.login(inputs.usuario, inputs.senha)
+    const handleLogin = (inputs) => {
+        login(inputs.usuario, inputs.senha)
             .then(
-                () => {
-                    setMensagemErro("");
-                    reset();
-                    navigation.navigate('Main');
-                },
+                () => { },
                 (error) => {
                     const resMessage =
                         (error.response &&
@@ -71,60 +26,111 @@ export default ({ navigation }) => {
                         error.message ||
                         error.toString();
 
+                    console.log(resMessage);
                     setMensagemErro(resMessage);
                 }
             );
-    };
+    }
 
     return (
-        <form
-            className={classes.layout}
-            onSubmit={handleSubmit(cbSubmit)}
-            autoComplete="off">
+        <View style={styles.container}>
+            <Image
+                style={styles.logo}
+                resizeMode='center'
+                source={require('../../images/logo.png')}
+            />
+            <Text style={styles.logoText}>Engelive</Text>
+            <Controller
+                control={control}
+                render={({ onChange, onBlur, value }) => (
+                    <View style={styles.inputView} >
+                        <TextInput
+                            style={styles.inputText}
+                            placeholder="Usuário"
+                            placeholderTextColor="#444444"
+                            onBlur={onBlur}
+                            onChangeText={value => onChange(value)}
+                            value={value}
+                        />
+                    </View>
+                )}
+                name="usuario"
+                rules={{ required: true }}
+                defaultValue=""
+            />
+            {errors.usuario && <Text style={styles.messages}>Campo obrigatório.</Text>}
+            <Controller
+                control={control}
+                render={({ onChange, onBlur, value }) => (
+                    <View style={styles.inputView} >
+                        <TextInput
+                            style={styles.inputText}
+                            placeholder="Senha"
+                            placeholderTextColor="#444444"
+                            secureTextEntry={true}
+                            onBlur={onBlur}
+                            onChangeText={value => onChange(value)}
+                            value={value}
+                        />
+                    </View>
+                )}
+                name="senha"
+                rules={{ required: true }}
+                defaultValue=""
+            />
+            {errors.senha && <Text style={styles.messages}>Campo obrigatório.</Text>}
+            {!!mensagemErro && <Text style={styles.messages}>{mensagemErro}</Text>}
+            <TouchableOpacity style={styles.loginBtn} onPress={handleSubmit(handleLogin)}>
+                <Text style={styles.loginText}>LOGIN</Text>
+            </TouchableOpacity>
 
-            <Paper className={classes.paper}>
-                <Typography component="h1" variant="h4" align="center">
-                    Login
-                    </Typography>
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Usuário"
-                            name="usuario"
-                            fullWidth
-                            error={errors.usuario ? true : false}
-                            helperText={errors.usuario ? errors.usuario.message : null}
-                            inputRef={register({
-                                required: "Campo obrigatório"
-                            })}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Senha"
-                            name="senha"
-                            type="password"
-                            fullWidth
-                            error={errors.senha ? true : false}
-                            helperText={errors.senha ? errors.senha.message : null}
-                            inputRef={register({
-                                required: "Campo obrigatório"
-                            })}
-                        />
-                    </Grid>
-                </Grid>
-                <Typography component="h6" variant="h6" align="center" className={classes.erro}>
-                    {mensagemErro}
-                </Typography>
-                <div className={classes.buttons}>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        className={classes.button}
-                    >Login</Button>
-                </div>
-            </Paper>
-        </form>
+
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    logo: {
+        height: "20%"
+    },
+    logoText: {
+        fontWeight: "bold",
+        fontSize: 50,
+        color: "#444444",
+        marginBottom: 20
+    },
+    inputView: {
+        width: "80%",
+        // backgroundColor: "#DCDCDC",
+        borderRadius: 25,
+        height: 50,
+        marginTop: 20,
+        justifyContent: "center",
+        padding: 20
+    },
+    inputText: {
+        height: 50,
+        color: "#444444"
+    },
+    loginBtn: {
+        width: "80%",
+        backgroundColor: "#444444",
+        borderRadius: 25,
+        height: 50,
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 40,
+        marginBottom: 10
+    },
+    loginText: {
+        color: "white"
+    },
+    messages: {
+        color: 'red'
+    }
+});

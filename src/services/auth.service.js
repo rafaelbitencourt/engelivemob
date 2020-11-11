@@ -1,6 +1,6 @@
 import api from "./api.js";
 
-// import { AsyncStorage } from 'react-native';
+// import { AsyncStorage } from 'react-native' ;
 
 class AuthService {
     login(usuario, senha) {
