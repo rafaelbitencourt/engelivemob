@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 
-import { FlatList, Text, View, Button, StyleSheet } from 'react-native';
+import { TouchableOpacity, FlatList, Text, View, Button, StyleSheet } from 'react-native';
 
 import AuthContext from "../../contexts/auth";
 import AppService from '../../services/app.service.js';
@@ -17,7 +17,13 @@ const styles = StyleSheet.create({
   },
 });
 
-const Projetos = () => {
+const Item = ({ item, onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <Text style={styles.item}>{item.nome}</Text>
+  </TouchableOpacity>
+);
+
+const Projetos = ({ navigation }) => {
   const { logout } = useContext(AuthContext);
   const [projetos, setProjetos] = useState([]);
 
@@ -36,12 +42,24 @@ const Projetos = () => {
           });
   };
 
+  const renderItem = ({ item }) => {
+    // const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
+
+    return (
+      <Item
+        item={item}
+        onPress={() => navigation.navigate('Plantas', { idprojeto: item.id})}
+        // style={{ backgroundColor }}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Button title="Sign Out" onPress={handleSignOut} />
       <FlatList
         data={projetos}
-        renderItem={({item}) => <Text style={styles.item}>{item.nome}</Text>}
+        renderItem={renderItem}
         keyExtractor={(item, index) => item.id.toString()}
       />
     </View>

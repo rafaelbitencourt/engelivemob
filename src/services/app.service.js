@@ -1,10 +1,16 @@
 import api from "./api.js";
 
-// import { AsyncStorage } from 'react-native' ;
-
 class AppService {
     listProjetos = () => api
         .get('projetos')
+        .then(({ data }) => data)
+
+    listPlantasPorProjeto = (id) => api
+        .get('projeto/' + id + '/plantas')
+        .then(({ data }) => data)
+
+    getPlantasMateriais = (idplanta) => api
+        .get('plantas_materiais/' + idplanta)
         .then(({ data }) => data)
 }
 
