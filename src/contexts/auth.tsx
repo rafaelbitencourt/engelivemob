@@ -4,6 +4,8 @@ import { View, ActivityIndicator } from "react-native";
 import AsyncStorage from '@react-native-community/async-storage';
 import AuthService from '../services/auth.service.js';
 
+import api from "../services/api.js";
+
 interface AuthContextData {
     signed: boolean;
     token: string;
@@ -27,6 +29,7 @@ export const AuthProvider: React.FC = ({ children }) => {
             if (storagedUser && storagedToken) {
                 setUser(JSON.parse(storagedUser));
                 setToken(storagedToken);
+                api.defaults.headers = { 'x-access-token': storagedToken };
             }
             setLoading(false);
         }
@@ -38,6 +41,7 @@ export const AuthProvider: React.FC = ({ children }) => {
         const response = await AuthService.login(usuario, senha);
         setUser(response);
         setToken(response.accessToken);
+        api.defaults.headers = { 'x-access-token': response.accessToken };
 
         await AsyncStorage.setItem('@EngeliveAuth:user', JSON.stringify(response));
         await AsyncStorage.setItem('@EngeliveAuth:token', response.accessToken);
