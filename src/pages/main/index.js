@@ -1,8 +1,7 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { TouchableOpacity, FlatList, Text, View, Button, StyleSheet } from 'react-native';
+import { TouchableOpacity, FlatList, Text, View, StyleSheet } from 'react-native';
 
-import AuthContext from "../../contexts/auth";
 import AppService from '../../services/app.service.js';
 
 const styles = StyleSheet.create({
@@ -24,12 +23,7 @@ const Item = ({ item, onPress }) => (
 );
 
 const Projetos = ({ navigation }) => {
-  const { logout } = useContext(AuthContext);
   const [projetos, setProjetos] = useState([]);
-
-  function handleSignOut() {
-    logout();
-  }
 
   useEffect(() => {
     atualizarLista();
@@ -56,7 +50,6 @@ const Projetos = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Button title="Sign Out" onPress={handleSignOut} />
       <FlatList
         data={projetos}
         renderItem={renderItem}
